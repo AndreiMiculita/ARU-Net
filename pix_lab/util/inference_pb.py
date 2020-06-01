@@ -5,6 +5,7 @@ import time
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import numpy as np
+import os
 from scipy import misc
 from pix_lab.util.util import load_graph
 
@@ -22,6 +23,11 @@ class Inference_pb(object):
         self.mode = mode
 
     def inference(self, print_result=True, gpu_device="0"):
+        try: 
+            os.makedirs("baselines")
+        except OSError:
+            if not os.path.isdir("baselines"):
+                raise
         val_size = len(self.img_list)
         if val_size is None:
             print("No Inference Data available. Skip Inference.")
@@ -36,6 +42,7 @@ class Inference_pb(object):
             for step in range(0, val_size):
                 aTime = time.time()
                 aImgPath = self.img_list[step]
+                aImgName = os.path.splitext(os.path.split(aImgPath)[1])[0]
                 print(
                     "Image: {:} ".format(aImgPath))
                 batch_x = self.load_img(aImgPath, self.scale, self.mode)
@@ -63,10 +70,8 @@ class Inference_pb(object):
                         else:
                             a = fig.add_subplot(1, n_class+1, aI+1)
                             plt.imshow(aPred[0,:, :,aI-1], cmap=plt.cm.gray, vmin=0.0, vmax=1.0)
-                            # misc.imsave('out' + str(aI) + '.jpg', aPred[0,:, :,aI-1])
+                            misc.imsave('baselines/' + aImgName + str(aI) + '.jpg', aPred[0,:, :,aI-1])
                             a.set_title('Channel: ' + str(aI-1))
-                    print('To go on just CLOSE the current plot.')
-                    plt.show()
             self.output_epoch_stats_val(timeSum/val_size)
 
             print("Inference Finished!")
