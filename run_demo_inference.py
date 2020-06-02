@@ -1,6 +1,7 @@
 from __future__ import print_function, division
 
 import click
+import warnings
 
 from pix_lab.util.inference_pb import Inference_pb
 from pix_lab.util.util import read_image_list
@@ -14,4 +15,6 @@ def run(path_list_imgs, path_net_pb):
     inference.inference()
 
 if __name__ == '__main__':
+    # There are a lot of deprecation warnings
+    warnings.simplefilter("ignore")
     run()
